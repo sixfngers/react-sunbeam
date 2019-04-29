@@ -8,7 +8,7 @@ type Props = {
     onItemFocus: (event: FocusEvent) => void
 }
 
-export const GamesGallery = memo(function GamesGallery({ usefocuskey, onItemFocus }: Props) {
+export const GamesGallery2 = memo(function GamesGallery2({ usefocuskey, onItemFocus }: Props) {
     const viewportRef = useRef<HTMLDivElement>(null)
     const trackRef = useRef<HTMLDivElement>(null)
     const [scrollX, setScrollX] = useState<number>(0)
