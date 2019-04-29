@@ -86,58 +86,58 @@ export class FocusManager {
 
         // 1. get current focus origin
         const focusOrigin = getNodeByPath(this.focusPath, this.focusableRoot)
-
         if (!focusOrigin) {
             throw new Error(`focusOrigin is not found, looks like the focusPath: ${this.focusPath} is invalid`)
         }
 
-        function findBestCandidateAmongSiblingsOf(
-            treeNode: FocusableTreeNode,
-            focusOrigin: FocusableTreeNode,
-            direction: Direction
-        ): FocusableTreeNode | undefined {
-            // 2. get all focusable siblings
-            const focusableSiblings = getSiblings(treeNode)
-
-            // 3. getBestCandidate(origin, candidates, Direction.RIGHT)
-            const siblingBoxes = focusableSiblings.map(node => node.getBoundingBox())
-
-            const bestCandidateBox = getBestCandidate(focusOrigin.getBoundingBox(), siblingBoxes, direction)
-
-            if (!bestCandidateBox) {
-                const parent = treeNode.getParent()
-
-                if (!parent) return undefined
-
-                return findBestCandidateAmongSiblingsOf(parent, focusOrigin, direction)
-            }
-
-            const bestCandidateIndex = siblingBoxes.indexOf(bestCandidateBox)
-            let bestCandidateNode = focusableSiblings[bestCandidateIndex]
-
-            while (bestCandidateNode) {
-                if (bestCandidateNode.getChildren().size === 0) {
-                    // we found the bestCandidate
-                    return bestCandidateNode
-                }
-
-                const preferredChild = bestCandidateNode.getPreferredChild(focusOrigin.getBoundingBox(), direction)
-
-                if (!preferredChild) {
-                    throw new Error(
-                        "`focusableTreeNode.getPreferredChild()` should " +
-                            "never return `undefined` when it has at least 1 child"
-                    )
-                }
-
-                bestCandidateNode = preferredChild
-            }
-        }
-
         const bestCandidate = findBestCandidateAmongSiblingsOf(focusOrigin, focusOrigin, direction)
+        if (!bestCandidate) return
 
-        if (bestCandidate) {
-            this.setFocus(getPathToNode(bestCandidate))
-        }
+        this.setFocus(getPathToNode(bestCandidate))
     }
+}
+
+function findBestCandidateAmongSiblingsOf(
+    treeNode: FocusableTreeNode,
+    focusOrigin: FocusableTreeNode,
+    direction: Direction
+): FocusableTreeNode | null {
+    // 2. Search for the best candidate among siblings of the current focusOrigin
+    // If not found repeat the same process for the parent FocusableNode's siblings
+    // until either the candidate is found or the FocusableRootNode is reached
+    const focusableSiblings = getSiblings(treeNode)
+
+    const siblingBoxes = focusableSiblings.map(node => node.getBoundingBox())
+    const bestCandidateBox = getBestCandidate(focusOrigin.getBoundingBox(), siblingBoxes, direction)
+    if (!bestCandidateBox) {
+        const parent = treeNode.getParent()
+        // Best candidate is not found, so the focus doesn't move
+        if (!parent) return null
+
+        return findBestCandidateAmongSiblingsOf(parent, focusOrigin, direction)
+    }
+
+    const bestCandidateIndex = siblingBoxes.indexOf(bestCandidateBox)
+    let bestCandidateNode = focusableSiblings[bestCandidateIndex]
+
+    // 3. Once the best candidate is found recursively ask it
+    // for the preferredChild FocusableNode until a leaf node is reached
+    while (bestCandidateNode) {
+        if (bestCandidateNode.getChildren().size === 0) {
+            // we found the bestCandidate
+            break
+        }
+
+        const preferredChild = bestCandidateNode.getPreferredChild(focusOrigin.getBoundingBox(), direction)
+        if (!preferredChild) {
+            throw new Error(
+                "`focusableTreeNode.getPreferredChild()` should " +
+                    "never return `undefined` when it has at least 1 child"
+            )
+        }
+
+        bestCandidateNode = preferredChild
+    }
+
+    return bestCandidateNode
 }

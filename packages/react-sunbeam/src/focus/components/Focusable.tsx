@@ -2,22 +2,22 @@ import * as React from "react"
 import { useMemo, useRef, useCallback, useEffect } from "react"
 import { FocusableTreeContext } from "../FocusableTreeContext"
 import { BoundingBox } from "../../spatialNavigation"
-import { ChildrenMap, FocusableTreeNode } from "../types"
+import { FocusableNodesMap, FocusableTreeNode } from "../types"
 import registerFocusableIn from "../registerFocusableIn"
 import unregisterFocusableIn from "../unregisterFocusableIn"
 import getPreferredNodeAmong from "../getPreferredNodeAmong"
 
 interface Props {
     focusKey: string
-    children: (param: { focused: boolean; path: ReadonlyArray<string> }) => React.ReactNode
+    children: React.ReactNode | ((param: { focused: boolean; path: ReadonlyArray<string> }) => React.ReactNode)
     style?: React.CSSProperties
     className?: string
 }
 
 export function Focusable(props: Props) {
     const { focusKey } = props
-    const focusableChildrenRef = useRef<ChildrenMap>(new Map())
     const wrapperRef = useRef<HTMLDivElement | null>(null)
+    const focusableChildrenRef = useRef<FocusableNodesMap>(new Map())
     const getBoundingBox = React.useCallback((): BoundingBox => {
         const wrapperElement = wrapperRef.current
         if (!wrapperElement) {
@@ -69,7 +69,7 @@ export function Focusable(props: Props) {
     return (
         <FocusableTreeContext.Provider value={childFocusableTreeContextValue}>
             <div ref={wrapperRef} className={props.className} style={props.style}>
-                {props.children(renderCallbackArgument)}
+                {typeof props.children === "function" ? props.children(renderCallbackArgument) : props.children}
             </div>
         </FocusableTreeContext.Provider>
     )

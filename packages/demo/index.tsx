@@ -1,11 +1,12 @@
 import * as React from "react"
 import { useCallback, useEffect, useState } from "react"
 import { render } from "react-dom"
-import { Focusable, SunbeamProvider, FocusManager, useSunbeam } from "react-sunbeam"
+import { SunbeamProvider, FocusManager, useSunbeam } from "react-sunbeam"
 
-import { Box } from "./Box"
-import { Menu } from "./Menu"
-import { Grid } from "./Grid"
+import { ProfilesMenu } from "./ProfilesMenu"
+import { GamesGallery } from "./GamesGallery"
+import { NavigationMenu } from "./NavigationMenu"
+import { FocusEvent } from "./FocusableItem"
 
 export function App() {
     const [selectedItem, setSelectedItem] = useState<string | null>(null)
@@ -17,131 +18,68 @@ export function App() {
 
             switch (event.key) {
                 case "ArrowRight":
+                    event.preventDefault()
                     moveFocusRight()
                     return
 
                 case "ArrowLeft":
+                    event.preventDefault()
                     moveFocusLeft()
                     return
 
                 case "ArrowUp":
+                    event.preventDefault()
                     moveFocusUp()
                     return
 
                 case "ArrowDown":
+                    event.preventDefault()
                     moveFocusDown()
                     return
 
                 case " ":
                 case "Enter":
+                    event.preventDefault()
                     alert(`Selected item: ${selectedItem}`)
                     return
             }
         },
         [focusManager, selectedItem]
     )
-
     useEffect(() => {
         document.addEventListener("keydown", onKeyDown)
 
         return () => document.removeEventListener("keydown", onKeyDown)
     }, [onKeyDown])
 
+    const handleItemFocus = useCallback(
+        (event: FocusEvent) => {
+            setSelectedItem(event.focusPath.join("->"))
+        },
+        [setSelectedItem]
+    )
+
     return (
-        <Focusable focusKey="app">
-            {({ focused }) => (
-                <div>
-                    <div style={{ display: "flex" }}>
-                        <Focusable focusKey="navigation">
-                            {({ focused }) => (
-                                <div style={{ display: "flex" }}>
-                                    <Focusable focusKey="movies" style={{ margin: "20px" }}>
-                                        {({ focused, path }) => (
-                                            <Box
-                                                focused={focused}
-                                                onFocus={() => setSelectedItem(path.join("->"))}
-                                                color="darkgray"
-                                                path={path}
-                                            >
-                                                Movies
-                                            </Box>
-                                        )}
-                                    </Focusable>
-                                    <Focusable focusKey="series" style={{ margin: "20px" }}>
-                                        {({ focused, path }) => (
-                                            <Box
-                                                focused={focused}
-                                                onFocus={() => setSelectedItem(path.join("->"))}
-                                                color="darkgray"
-                                                path={path}
-                                            >
-                                                Series
-                                            </Box>
-                                        )}
-                                    </Focusable>
-                                    <Focusable focusKey="sports" style={{ margin: "20px" }}>
-                                        {({ focused, path }) => (
-                                            <Box
-                                                focused={focused}
-                                                onFocus={() => setSelectedItem(path.join("->"))}
-                                                color="darkgray"
-                                                path={path}
-                                            >
-                                                Sports
-                                            </Box>
-                                        )}
-                                    </Focusable>
-                                    <Focusable focusKey="kids" style={{ margin: "20px" }}>
-                                        {({ focused, path }) => (
-                                            <Box
-                                                focused={focused}
-                                                onFocus={() => setSelectedItem(path.join("->"))}
-                                                color="darkgray"
-                                                path={path}
-                                            >
-                                                Kids
-                                            </Box>
-                                        )}
-                                    </Focusable>
-                                </div>
-                            )}
-                        </Focusable>
-                    </div>
-                    <div style={{ display: "flex" }}>
-                        <Focusable focusKey="leftMenu">
-                            {({ focused }) => (
-                                <Menu
-                                    size={5}
-                                    onItemFocus={itemFocusPath => {
-                                        setSelectedItem(itemFocusPath.join("->"))
-                                    }}
-                                />
-                            )}
-                        </Focusable>
-                        <Focusable focusKey="grid">
-                            {({ focused }) => (
-                                <Grid
-                                    size={30}
-                                    onItemFocus={itemFocusPath => {
-                                        setSelectedItem(itemFocusPath.join("->"))
-                                    }}
-                                />
-                            )}
-                        </Focusable>
-                        <Focusable focusKey="rightMenu">
-                            {({ focused }) => (
-                                <Menu
-                                    size={5}
-                                    onItemFocus={itemFocusPath => {
-                                        setSelectedItem(itemFocusPath.join("->"))
-                                    }}
-                                />
-                            )}
-                        </Focusable>
-                    </div>
-                </div>
-            )}
-        </Focusable>
+        <div
+            style={{
+                backgroundColor: "#2D2D2D",
+                display: "flex",
+                flexDirection: "column",
+                height: "720px",
+                width: "1280px",
+                overflow: "hidden",
+            }}
+        >
+            <div style={{ marginTop: "32px", marginLeft: "60px" }}>
+                <ProfilesMenu onItemFocus={handleItemFocus} />
+            </div>
+            <div style={{ marginTop: "94px", alignSelf: "center" }}>
+                <GamesGallery onItemFocus={handleItemFocus} />
+            </div>
+            <div style={{ marginTop: "94px", alignSelf: "center" }}>
+                <NavigationMenu onItemFocus={handleItemFocus} />
+            </div>
+        </div>
     )
 }
 

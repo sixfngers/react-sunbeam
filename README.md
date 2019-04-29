@@ -64,25 +64,23 @@ function App() {
                 {({ focused }) => <div>{focused ? "I am focused" : "I am not focused"}</div>}
             </Focusable>
             <Focusable focusKey="menuContainer">
-                {({ focused }) => (
-                    <div>
-                        <Focusable focusKey="menuItem1">
-                            {({ focused }) => (
-                                <div style={{ backgroundColor: focused ? "salmon" : "deepskyblue" }}>
-                                    You can nest Focusables
-                                </div>
-                            )}
-                        </Focusable>
-                        <Focusable focusKey="menuItem2">
-                            {({ focused }) => (
-                                <div style={{ backgroundColor: focused ? "salmon" : "deepskyblue" }}>
-                                    In this case Sunbeam will try to find the best candidate for the focus within the
-                                    common Focusable parent first
-                                </div>
-                            )}
-                        </Focusable>
-                    </div>
-                )}
+                <div>
+                    <Focusable focusKey="menuItem1">
+                        {({ focused }) => (
+                            <div style={{ backgroundColor: focused ? "salmon" : "deepskyblue" }}>
+                                You can nest Focusables
+                            </div>
+                        )}
+                    </Focusable>
+                    <Focusable focusKey="menuItem2">
+                        {({ focused }) => (
+                            <div style={{ backgroundColor: focused ? "salmon" : "deepskyblue" }}>
+                                In this case Sunbeam will try to find the best candidate for the focus within the common
+                                Focusable parent first
+                            </div>
+                        )}
+                    </Focusable>
+                </div>
             </Focusable>
             <Focusable focusKey="item2">
                 {({ focused, path }) => (
@@ -91,7 +89,7 @@ function App() {
                     </div>
                 )}
             </Focusable>
-        </div>
+        </Focusable>
     )
 }
 
@@ -106,3 +104,7 @@ render(
     document.getElementById("app")
 )
 ```
+
+## API
+
+TODO

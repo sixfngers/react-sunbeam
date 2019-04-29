@@ -1,4 +1,4 @@
-import { ChildrenMap, FocusableTreeNode, FocusPath } from "./types"
+import { FocusableNodesMap, FocusableTreeNode, FocusPath } from "./types"
 import { FOCUSABLE_TREE_ROOT_KEY } from "./Constants"
 
 export function validateAndFixFocusPathIfNeeded(focusPath: FocusPath, treeRoot: FocusableTreeNode): FocusPath | null {
@@ -23,7 +23,7 @@ export function validateAndFixFocusPathIfNeeded(focusPath: FocusPath, treeRoot: 
     let focusedNode: FocusableTreeNode | undefined = treeRoot
     while (focusedNode) {
         const focusedChildKey: string | undefined = focusPath[focusPathSegmentIndex]
-        const children: ChildrenMap = focusedNode.getChildren()
+        const children: FocusableNodesMap = focusedNode.getChildren()
 
         if (children.size === 0) {
             // we reached the focused leaf of the tree
@@ -88,7 +88,6 @@ export function getPathToNode(treeNode: FocusableTreeNode): FocusPath {
 
 export function getSiblings(focusableTreeNode: FocusableTreeNode): ReadonlyArray<FocusableTreeNode> {
     const parent = focusableTreeNode.getParent()
-
     const siblings: FocusableTreeNode[] = []
 
     if (!parent) return siblings
